@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuminaART | Galeria Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        /* Transições de Tela */
+        .page { display: none; animation: fadeIn 0.5s ease-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Acessibilidade Dinâmica */
+        .large-font * { font-size: 110% !important; line-height: 1.6 !important; }
+        .color-blind .text-amber-500 { color: #60A5FA !important; }
+        .color-blind .bg-amber-500 { background-color: #60A5FA !important; }
+        .color-blind .border-amber-500 { border-color: #60A5FA !important; }
+    </style>
+</head>
+<body>
+
+    <div class="flex flex-col h-screen max-w-md mx-auto shadow-2xl overflow-hidden relative border-x border-white/10">
+        
+        <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-black px-4 py-2 rounded-full font-bold text-xs flex items-center gap-2 shadow-xl hidden">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Link copiado para partilhar!
+        </div>
+
+        <header class="p-6 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 flex justify-between items-center sticky top-0 z-40">
+            <div>
+                <h1 class="text-xl font-serif font-bold tracking-widest uppercase">Lumina<span class="text-amber-500">ART</span></h1>
+                <p class="text-[9px] text-gray-500 tracking-[0.2em] uppercase">Galeria Digital Curada</p>
+            </div>
+            <div class="flex gap-4">
+                <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 p-[1px]">
+                    <div class="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                        <i data-lucide="user" class="w-4 h-4 text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow overflow-y-auto custom-scrollbar">
+            
+            <section id="view-feed" class="page active p-4 space-y-6">
+                <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+                    <button class="px-4 py-2 rounded-full text-[10px] font-bold uppercase bg-amber-500 text-black border border-amber-500">Todas</button>
+                    <button class="px-4 py-2 rounded-full text-[10px] font-bold uppercase border border-white/20 text-gray-400">Renascença</button>
+                    <button class="px-4 py-2 rounded-full text-[10px] font-bold uppercase border border-white/20 text-gray-400">Modernismo</button>
+                </div>
+
+                <div id="gallery-grid" class="grid grid-cols-1 gap-8">
+                    </div>
+            </section>
+
+            <section id="view-detail" class="page">
+                <div id="detail-content"></div>
+            </section>
+
+            <section id="view-profile" class="page p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <i data-lucide="accessibility" class="text-amber-500 w-7 h-7"></i>
+                    <h2 class="text-2xl font-serif font-bold">Configurações</h2>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-sm">Modo Daltônico</p>
+                            <p class="text-[10px] text-gray-400">Alto contraste azul.</p>
+                        </div>
+                        <input type="checkbox" onchange="toggleAcc('colorBlind')" class="w-10 h-5 appearance-none bg-gray-700 rounded-full checked:bg-amber-500 transition-all relative cursor-pointer before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-sm">Fonte Ampliada</p>
+                            <p class="text-[10px] text-gray-400">Melhor legibilidade.</p>
+                        </div>
+                        <input type="checkbox" onchange="toggleAcc('largeFont')" class="w-10 h-5 appearance-none bg-gray-700 rounded-full checked:bg-amber-500 transition-all relative cursor-pointer before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all">
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="h-20 bg-[#0a0a0a] border-t border-white/10 flex justify-around items-center px-4 shrink-0 z-50">
+            <button onclick="showPage('feed')" class="flex flex-col items-center gap-1 text-amber-500">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[8px] font-bold uppercase">Início</span>
+            </button>
+            <button class="text-gray-600 flex flex-col items-center gap-1">
+                <i data-lucide="search" class="w-5 h-5"></i>
+                <span class="text-[8px] font-bold uppercase">Busca</span>
+            </button>
+            <div class="bg-white text-black p-4 rounded-2xl -mt-12 border-8 border-[#050505] shadow-2xl">
+                <i data-lucide="plus-square" class="w-6 h-6"></i>
+            </div>
+            <button class="text-gray-600 flex flex-col items-center gap-1">
+                <i data-lucide="palette" class="w-5 h-5"></i>
+                <span class="text-[8px] font-bold uppercase">Museus</span>
+            </button>
+            <button onclick="showPage('profile')" class="flex flex-col items-center gap-1 text-gray-600">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[8px] font-bold uppercase">Perfil</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        const arts = [
+            { id: 1, title: "O Nascimento de Vênus", artist: "Sandro Botticelli", period: "Renascença", year: "1485", image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=1000", description: "Uma das obras mais icônicas da Renascença italiana.", likes: 15402 },
+            { id: 2, title: "Noite Estrelada", artist: "Van Gogh", period: "Pós-Impressionismo", year: "1889", image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000", description: "Uma visão turbulenta do céu noturno.", likes: 25600 },
+            { id: 3, title: "Fragmentos Digitais", artist: "CyberArt", period: "Arte Digital", year: "2024", image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000", description: "Exploração de fractais e luzes neon.", likes: 4200 }
+        ];
+
+        // Renderizar Galeria
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = arts.map(art => `
+                <div class="group relative" onclick="showDetail(${art.id})">
+                    <div class="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-2xl border border-white/5">
+                        <img src="${art.image}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute bottom-0 left-0 p-6 w-full">
+                            <span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1 block">${art.period}</span>
+                            <h2 class="text-2xl font-serif font-bold text-white leading-tight">${art.title}</h2>
+                            <p class="text-sm text-gray-300 font-light italic">por ${art.artist}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Navegação de Telas
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`view-${pageId}`).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        // Mostrar Detalhes
+        function showDetail(id) {
+            const art = arts.find(a => a.id === id);
+            const detailView = document.getElementById('detail-content');
+            detailView.innerHTML = `
+                <div class="relative">
+                    <img src="${art.image}" class="w-full aspect-[4/5] object-cover">
+                    <button onclick="showPage('feed')" class="absolute top-6 left-6 p-2 bg-black/50 backdrop-blur-lg rounded-full border border-white/20">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="p-8 space-y-6">
+                    <h2 class="text-3xl font-serif font-bold">${art.title}</h2>
+                    <p class="text-amber-500 font-medium">${art.artist} | ${art.year}</p>
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/10">
+                        <p class="text-gray-300 text-sm leading-relaxed">${art.description}</p>
+                    </div>
+                    <button onclick="showToast()" class="w-full bg-white text-black font-bold py-4 rounded-xl uppercase text-xs tracking-widest hover:bg-amber-500 transition-colors">
+                        Partilhar Obra
+                    </button>
+                </div>
+            `;
+            showPage('detail');
+            lucide.createIcons();
+        }
+
+        // Funcionalidades
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function toggleAcc(type) {
+            if(type === 'largeFont') document.body.classList.toggle('large-font');
+            if(type === 'colorBlind') document.body.classList.toggle('color-blind');
+        }
+
+        // Inicialização
+        window.onload = () => {
+            renderGallery();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
